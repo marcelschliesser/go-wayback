@@ -1,4 +1,5 @@
 import urllib.request
+import urllib.parse
 import threading
 import base64
 import time
@@ -6,16 +7,35 @@ import json
 import os
 
 
+def archive_urls_to_json_file(host: str) -> None:
+    """
+    Save all known urls from a host on archive.org in a json file.
+    Save local because of a slow Archive Server.
+    2012 - 2013 are the last valid entries for these urls.
 
-def archive_urls():
-    url = "https://web.archive.org/cdx/search/cdx?url=xxl-angeln.de&matchType=domain&from=2012&to=2013&filter=statuscode:200&output=json"
+        Parameters:
+            host (str): A host for getting the archive urls.
+
+        Returns:
+            None
+    """
+
+    base = "https://web.archive.org/cdx/search/cdx?"
+    params = {
+        "url": host,
+        "matchType": "domain",
+        "filters": "statuscode:200",
+        "output": "json",
+        "from": "2012",
+        "to": "2013"
+    }
+    url = base + urllib.parse.urlencode(params)
     req = urllib.request.urlopen(url)
     res = req.read()
     j = json.loads(res.decode("utf-8"))
-    print(f"Archive URL Count: {len(j)}")
-    with open('archive_urls.json', 'w', encoding='utf-8') as f:
+    with open('urls_to_restore.json', 'w', encoding='utf-8') as f:
         json.dump(j, f)
-
+    print(f"Saved all URLs in File. URL Count: {len(j)}")
 
 
 def download(timestamp, original, mimetype):
@@ -24,7 +44,8 @@ def download(timestamp, original, mimetype):
     remaining_download_tries = 20
     while remaining_download_tries > 0:
         try:
-            urllib.request.urlretrieve(base, f'data/{mimetype}/{encode_url.decode("utf-8")}.{timestamp}.{mimetype.split("/")[-1]}')
+            urllib.request.urlretrieve(
+                base, f'data/{mimetype}/{encode_url.decode("utf-8")}.{timestamp}.{mimetype.split("/")[-1]}')
             print(f"successfully downloaded: {original}")
             time.sleep(0.5)
         except:
@@ -34,13 +55,11 @@ def download(timestamp, original, mimetype):
             continue
 
 
-
 def mimetypes(lst):
     mimetypes = list(set([i[3] for i in lst]))
     for m in mimetypes:
         if not os.path.exists(f'data/{m}'):
             os.makedirs(f'data/{m}')
-
 
 
 def partition(lst):
@@ -50,36 +69,24 @@ def partition(lst):
 
 
 def main():
-    for i in lst[1:11]:
-        print(i)
+    archive_urls_to_json_file("xxl-angeln.de")
+    # for i in lst[1:11]:
+    #    print(i)
     #    threading.Thread(target=download, args=(i[1], i[2], i[3], )).start()
 
 
 if __name__ == "__main__":
-    with open('archive_urls.json') as f:
-        lst = json.load(f)
-    #archive_urls()
-    #mimetypes()
-    for i in partition(lst):
-        print(list(i))
+    # with open('archive_urls.json') as f:
+    #    lst = json.load(f)
+    # archive_urls()
+    # mimetypes()
+    # for i in partition(lst):
+    #    print(list(i))
     main()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 #
-#def images():
+# def images():
 #  req = requests.get('http://web.archive.org/cdx/search/cdx?url=xxl-angeln.de&matchType=host&from=2010&to=2013&filter=statuscode:200&filter=mimetype:image/.*&output=json&collapse=digest')
 #  res = req.json()
 #
@@ -90,7 +97,7 @@ if __name__ == "__main__":
 #    urllib.request.urlretrieve(url, f"images/{i[1]}-{url.split('/')[-1]}")
 #
 #
-#def fangmeldung():
+# def fangmeldung():
 #  req = requests.get('http://web.archive.org/cdx/search/cdx?url=http://www.xxl-angeln.de/angel_praxis/fangmeldungen/*&filter=statuscode:200&filter=mimetype:text/html&output=json&fl=original,timestamp&collapse=urlkey')
 #  res = req.json()
 #  print(len(res))
@@ -105,7 +112,7 @@ if __name__ == "__main__":
 #          print(url)
 #    #break
 #
-#def parse():
+# def parse():
 #  all = []
 #  for fname in os.listdir('fangmeldungen')[:250]:
 #    data = {}
@@ -144,8 +151,8 @@ if __name__ == "__main__":
 #        title = soup.find("h1", class_="title")
 #        if title:
 #          data['title'] = title.get_text()
-#        
-#        
+#
+#
 #        for part in soup.select('div[class*="linedata"]'):
 #          i = re.sub(r"\s\s+", '', part.get_text()).replace('\n','').replace(' :',':').split(':',1)
 #          data[i[0]] = i[1]
@@ -162,7 +169,7 @@ if __name__ == "__main__":
 #
 #
 #
-#def profile():
+# def profile():
 #  req = requests.get('http://web.archive.org/cdx/search/cdx?url=http://www.xxl-angeln.de/content/view/profile/*&filter=statuscode:200&filter=mimetype:text/html&output=json&fl=original,timestamp&collapse=urlkey')
 #  res = req.json()
 #  print(len(res))
@@ -174,6 +181,6 @@ if __name__ == "__main__":
 #    except:
 #      print(url)
 #
-##fangmeldung()
-#parse()
-##profile()
+# fangmeldung()
+# parse()
+# profile()

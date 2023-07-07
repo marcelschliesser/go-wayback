@@ -47,8 +47,9 @@ func main() {
 		log.Fatal(err2)
 	}
 	log.Printf("Wayback URL Count: %d", len(result))
-	//for k, v := range result {
-	//	fmt.Println(k, v)
-	//}
+	for _, v := range result {
+		fmt.Printf("http://web.archive.org/web/%vif_/%v", v[1], v[2])
+		fmt.Println("")
+	}
 
 }

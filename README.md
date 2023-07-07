@@ -1,2 +1,3 @@
-# xxl-angeln-de
-Restore a old Webpage from archive.org.
+# Restore a WebPage from Archive.org
+- `restore` Folder: (Restore HTML from WayBackMachine)
+- `app` Folder: WebApp (to be build)

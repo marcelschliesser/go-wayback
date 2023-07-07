@@ -9,15 +9,11 @@ import (
 	"net/url"
 )
 
-func main() {
-	log.SetFlags(log.LstdFlags) // Include timestamp in log messages
-
-	var base_url string = "https://web.archive.org/cdx/search/cdx?"
-
+func returnArchiveUrls(domain string) [][]string {
+	const base_url string = "https://web.archive.org/cdx/search/cdx?"
 	params := url.Values{}
-
 	get_parameters := map[string]string{
-		"url":       "xxl-angeln.de",
+		"url":       domain,
 		"matchType": "domain",
 		"filtes":    "statuscode:200",
 		"output":    "json",
@@ -27,7 +23,6 @@ func main() {
 	for k, v := range get_parameters {
 		params.Add(k, v)
 	}
-
 	url := fmt.Sprintf(base_url + params.Encode())
 	log.Printf("Base Url: %v", url)
 	resp, err := http.Get(url)
@@ -38,8 +33,6 @@ func main() {
 
 	body, err := io.ReadAll(resp.Body) // return []byte
 
-	log.Printf("Body Type is: %T", body)
-
 	var result [][]string
 
 	err2 := json.Unmarshal(body, &result)
@@ -47,7 +40,15 @@ func main() {
 		log.Fatal(err2)
 	}
 	log.Printf("Wayback URL Count: %d", len(result))
-	for _, v := range result {
+	return result
+}
+
+func main() {
+	log.SetFlags(log.LstdFlags) // Include timestamp in log messages
+
+	urls := returnArchiveUrls("xxl-angeln.de")
+
+	for _, v := range urls {
 		fmt.Printf("http://web.archive.org/web/%vif_/%v", v[1], v[2])
 		fmt.Println("")
 	}

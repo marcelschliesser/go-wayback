@@ -7,12 +7,6 @@ import (
 	"text/template"
 )
 
-func checkError(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a data instance with the message to be displayed in the template.
 	data, err := ioutil.ReadFile("data.json")
@@ -29,6 +23,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	log.Println("Start Export")
+	export()
+	log.Println("Finished Export")
+	log.Println("Start Server")
 	http.HandleFunc("/", indexHandler)
 	http.ListenAndServe(":8080", nil)
 }

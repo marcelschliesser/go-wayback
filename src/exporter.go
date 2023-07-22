@@ -50,7 +50,7 @@ func returnArchiveUrls(domain string) [][]string {
 	return result
 }
 
-func main() {
+func export() {
 	// Include timestamp in log messages
 	log.SetFlags(log.LstdFlags)
 

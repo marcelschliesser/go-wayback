@@ -5,6 +5,9 @@ on:
     branches:
       - live
 
+env:
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy

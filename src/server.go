@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -8,6 +9,14 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm() // Parse incoming form data
+
+	fmt.Println("Received form data:")
+	for key, values := range r.Form { // range over map
+		for _, value := range values { // range over []string
+			fmt.Println(key, value)
+		}
+	}
 	// Create a data instance with the message to be displayed in the template.
 	data, err := ioutil.ReadFile("data.json")
 	checkError(err)

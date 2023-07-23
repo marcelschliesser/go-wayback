@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+    <title>Results</title>
+</head>
+<body>
+  <main class="container">
+    <h1>Results</h1>
+    <p>URLs found for the Domain:</p>
+    <ul>
+        {{range .}}
+            <li>{{.}}</li>
+        {{end}}
+    </ul>
+  </main>
+</body>
+</html>

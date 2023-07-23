@@ -1,11 +1,18 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Go Web App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+    <title>Index</title>
 </head>
 <body>
-    <h1>Your Data</h1>
-    <p>{{.}}</p>
+    <main class="container">
+    <h1>Your Domain</h1>
+    <form method="POST">
+        <label for="name">Enter a Domain (kfz.net):</label><br>
+        <input type="text" id="domain" name="domain"><br>
+        <input type="submit" value="Submit">
+    </form>
+    </main> 
 </body>
 </html>

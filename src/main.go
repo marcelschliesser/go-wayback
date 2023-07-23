@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -18,7 +18,10 @@ func checkError(err error) {
 		log.Fatal(err)
 	}
 }
-
+func main() {
+	http.HandleFunc("/", HomePage)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
 func returnArchiveUrls(domain string) [][]string {
 	const base_url string = "https://web.archive.org/cdx/search/cdx?"
 	params := url.Values{}
@@ -50,26 +53,17 @@ func returnArchiveUrls(domain string) [][]string {
 	return result
 }
 
-func export() {
-	// Include timestamp in log messages
-	log.SetFlags(log.LstdFlags)
-
-	urls := returnArchiveUrls("xxl-angeln.de")
-
-	fieldNames := urls[0]
-	records := make([]map[string]string, len(urls)-1)
-	for i, record := range urls[1:] {
-		recordMap := make(map[string]string, len(fieldNames))
-
-		for j, field := range record {
-			recordMap[fieldNames[j]] = field
-		}
-
-		records[i] = recordMap
+func HomePage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		tmpl := template.Must(template.ParseFiles("templates/index.html"))
+		tmpl.Execute(w, nil)
+		return
+	} else if r.Method == http.MethodPost {
+		domain := r.FormValue("domain")
+		d := returnArchiveUrls(domain)
+		tmpl := template.Must(template.ParseFiles("templates/result.html"))
+		tmpl.Execute(w, d)
+		return
 	}
-	data, err := json.Marshal(records)
-	checkError(err)
-	ioutil.WriteFile("data.json", data, 0644)
-	log.Printf("Wayback URL Count: %d", len(records))
-	log.Printf("Wayback URL Count: %d", len(urls))
+
 }

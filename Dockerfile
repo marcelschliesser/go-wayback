@@ -1,12 +1,8 @@
-FROM golang:latest
+FROM golang:1.20.6-alpine3.18
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-
-RUN go mod download
-
-COPY . .
+COPY src/ .
 
 RUN go build -o main .
 

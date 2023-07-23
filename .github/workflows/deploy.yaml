@@ -7,6 +7,7 @@ on:
 
 env:
   GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+  SERVICE_NAME: wayback-exporter
 
 jobs:
   setup-build-publish-deploy:
@@ -30,9 +31,14 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        docker build -t gcr.io/$GCP_PROJECT/my-app:$GITHUB_SHA .
-        docker push gcr.io/$GCP_PROJECT/my-app:$GITHUB_SHA
+        docker build -t gcr.io/$GCP_PROJECT/$SERVICE_NAME:$GITHUB_SHA .
+        docker push gcr.io/$GCP_PROJECT/$SERVICE_NAME:$GITHUB_SHA
 
     - name: Deploy to Cloud Run
       run: |
-        gcloud run deploy my-app --image gcr.io/$GCP_PROJECT/my-app:$GITHUB_SHA --platform managed --region europe-west3 --allow-unauthenticated
+        gcloud run deploy $SERVICE_NAME \
+          --image gcr.io/$GCP_PROJECT/$SERVICE_NAME:$GITHUB_SHA \
+          --platform managed \
+          --region europe-west3 \
+          --allow-unauthenticated \
+          --max-instances 2

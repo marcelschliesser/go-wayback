@@ -55,14 +55,16 @@ func returnArchiveUrls(domain string) [][]string {
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		tmpl := template.Must(template.ParseFiles("templates/index.html"))
-		tmpl.Execute(w, nil)
+		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/index.html"))
+		err := tmpl.ExecuteTemplate(w, "base.html", nil)
+		checkError(err)
 		return
 	} else if r.Method == http.MethodPost {
 		domain := r.FormValue("domain")
 		d := returnArchiveUrls(domain)
-		tmpl := template.Must(template.ParseFiles("templates/result.html"))
-		tmpl.Execute(w, d)
+		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/result.html"))
+		err := tmpl.ExecuteTemplate(w, "base.html", d)
+		checkError(err)
 		return
 	}
 

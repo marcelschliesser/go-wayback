@@ -1,19 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-
-    <title>Results</title>
-</head>
-<body>
-  <main class="container">
-    <h1>Results</h1>
-    <p>URLs found for the Domain:</p>
+{{define "content"}}
+<h1>Archive URLs</h1>
+{{ if . }}
     <ul>
-        {{range .}}
-            <li>{{.}}</li>
-        {{end}}
+        {{ range . }}
+            <li>{{ index . }}</li>
+        {{ end }}
     </ul>
-  </main>
-</body>
-</html>
+{{ else }}
+    <p>No archive URLs found.</p>
+{{ end }}
+{{end}}

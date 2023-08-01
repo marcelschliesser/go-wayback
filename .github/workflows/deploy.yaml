@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - live
+      - dev
 
 env:
   GCP_PROJECT: ${{ secrets.GCP_PROJECT }}

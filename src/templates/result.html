@@ -1,11 +1,21 @@
 {{define "content"}}
-<h1>Archive URLs</h1>
+<hgroup>
+    <h1>Result</h1>
+    <h2>For the entered <strong>domain</strong> and </strong>year</strong> i found the following Urls.</h2>
+</hgroup>
 {{ if . }}
-    <ul>
-        {{ range . }}
-            <li>{{ index . }}</li>
-        {{ end }}
-    </ul>
+<table>
+    <tr>
+      <th><strong>Timestamp</strong></th>
+      <th><strong>Url</strong></th>
+    </tr>
+    {{ range . }}
+        <tr>
+            <td>{{ index .Timestamp }}</td>
+            <td>{{ index .Original }}</td>
+        </tr>
+    {{ end }}
+  </table>
 {{ else }}
     <p>No archive URLs found.</p>
 {{ end }}

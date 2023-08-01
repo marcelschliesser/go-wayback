@@ -1,9 +1,20 @@
 {{define "content"}}
-<h1>Your Domain</h1>
+<hgroup>
+    <h1>Waybackmachine Downloader</h1>
+    <h2>Export your old content by year from the Waybackmachine.</h2>
+</hgroup>
+
 <form method="POST">
-    <label for="name">Enter a Domain (kfz.net):</label><br>
-    <input type="text" id="domain" name="domain"><br>
-    <input type="submit" value="Submit">
+    <label for="domain">Domain</label>
+    <input type="domain" id="domain" name="domain" placeholder="kintasio.de" required>
+    <small>We'll never share your domain with anyone else.</small>
+
+    <label for="year">Year</label>
+    <input type="year" id="year" name="year" placeholder="2013" required>
+    <small>We'll never share your year with anyone else.</small>
+  
+    <button type="submit">Submit</button>
 </form>
+
 {{end}}
 

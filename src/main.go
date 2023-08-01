@@ -65,19 +65,22 @@ func returnArchiveUrls(domain, year string) [][]string {
 
 func convertResponse(input [][]string) []Record {
 	var records []Record
-	for _, values := range input[1:] {
-		records = append(records, Record{
-			URLKey:     values[0],
-			Timestamp:  values[1],
-			Original:   values[2],
-			MimeType:   values[3],
-			StatusCode: values[4],
-			Digest:     values[5],
-			Length:     values[6],
-		})
+	if len(input) > 1 {
+		for _, values := range input[1:] {
+			records = append(records, Record{
+				URLKey:     values[0],
+				Timestamp:  values[1],
+				Original:   values[2],
+				MimeType:   values[3],
+				StatusCode: values[4],
+				Digest:     values[5],
+				Length:     values[6],
+			})
+		}
+		return records
+	} else {
+		return nil
 	}
-
-	return records
 }
 
 func HomePage(w http.ResponseWriter, r *http.Request) {

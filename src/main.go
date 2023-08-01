@@ -10,6 +10,16 @@ import (
 	"net/url"
 )
 
+type Record struct {
+	URLKey     string
+	Timestamp  string
+	Original   string
+	MimeType   string
+	StatusCode string
+	Digest     string
+	Length     string
+}
+
 // HTTP client that can be reused for multiple requests.
 var httpClient = &http.Client{}
 
@@ -22,7 +32,7 @@ func main() {
 	http.HandleFunc("/", HomePage)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
-func returnArchiveUrls(domain string) [][]string {
+func returnArchiveUrls(domain, year string) [][]string {
 	const base_url string = "https://web.archive.org/cdx/search/cdx?"
 	params := url.Values{}
 	get_parameters := map[string]string{
@@ -30,8 +40,8 @@ func returnArchiveUrls(domain string) [][]string {
 		"matchType": "domain",
 		"filter":    "statuscode:200",
 		"output":    "json",
-		"from":      "2011",
-		"to":        "2013"}
+		"from":      year,
+		"to":        year}
 
 	for k, v := range get_parameters {
 		params.Add(k, v)
@@ -53,6 +63,23 @@ func returnArchiveUrls(domain string) [][]string {
 	return result
 }
 
+func convertResponse(input [][]string) []Record {
+	var records []Record
+	for _, values := range input[1:] {
+		records = append(records, Record{
+			URLKey:     values[0],
+			Timestamp:  values[1],
+			Original:   values[2],
+			MimeType:   values[3],
+			StatusCode: values[4],
+			Digest:     values[5],
+			Length:     values[6],
+		})
+	}
+
+	return records
+}
+
 func HomePage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/index.html"))
@@ -61,9 +88,11 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if r.Method == http.MethodPost {
 		domain := r.FormValue("domain")
-		d := returnArchiveUrls(domain)
+		year := r.FormValue("year")
+		d := returnArchiveUrls(domain, year)
+		converted := convertResponse(d)
 		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/result.html"))
-		err := tmpl.ExecuteTemplate(w, "base.html", d)
+		err := tmpl.ExecuteTemplate(w, "base.html", converted)
 		checkError(err)
 		return
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -33,8 +32,8 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 func returnArchiveUrls(domain, year string) [][]string {
-	const base_url string = "https://web.archive.org/cdx/search/cdx?"
-	params := url.Values{}
+	base_url, _ := url.Parse("https://web.archive.org/cdx/search/cdx?")
+	query := url.Values{}
 	get_parameters := map[string]string{
 		"url":       domain,
 		"matchType": "domain",
@@ -43,12 +42,13 @@ func returnArchiveUrls(domain, year string) [][]string {
 		"from":      year,
 		"to":        year}
 
-	for k, v := range get_parameters {
-		params.Add(k, v)
+	for key, value := range get_parameters {
+		query.Set(key, value)
 	}
-	url := fmt.Sprintf(base_url + params.Encode())
-	log.Printf("Base Url: %v", url)
-	resp, err := httpClient.Get(url)
+	base_url.RawQuery = query.Encode()
+	finalURL := base_url.String()
+	log.Printf("Base Url: %v", finalURL)
+	resp, err := httpClient.Get(finalURL)
 	checkError(err)
 	defer resp.Body.Close()
 

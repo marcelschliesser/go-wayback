@@ -34,11 +34,6 @@ func checkError(err error) {
 	}
 }
 
-func main() {
-	http.HandleFunc("/", HomePage)
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-
 func returnArchiveUrls(domain, year string) [][]string {
 	base_url, _ := url.Parse("https://web.archive.org/cdx/search/cdx?")
 	query := url.Values{}
@@ -55,7 +50,7 @@ func returnArchiveUrls(domain, year string) [][]string {
 	}
 	base_url.RawQuery = query.Encode()
 	finalURL := base_url.String()
-	log.Printf("Base Url: %v", finalURL)
+	log.Printf("GET: %v", finalURL)
 	resp, err := httpClient.Get(finalURL)
 	checkError(err)
 	defer resp.Body.Close()
@@ -91,23 +86,26 @@ func convertResponse(input [][]string) []Record {
 	}
 }
 
-func HomePage(w http.ResponseWriter, r *http.Request) {
+func indexPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/index.html"))
 		err := tmpl.ExecuteTemplate(w, "base.html", nil)
 		checkError(err)
 		return
 	} else if r.Method == http.MethodPost {
-		domain := r.FormValue("domain")
-		year := r.FormValue("year")
 		var d Data
-		d.Domain = domain
-		d.Year = year
-		d.Records = convertResponse(returnArchiveUrls(domain, year))
+		d.Domain = r.FormValue("domain")
+		d.Year = r.FormValue("year")
+		d.Records = convertResponse(returnArchiveUrls(d.Domain, d.Year))
 		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/result.html"))
 		err := tmpl.ExecuteTemplate(w, "base.html", d)
 		checkError(err)
 		return
 	}
 
+}
+
+func main() {
+	http.HandleFunc("/", indexPage)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

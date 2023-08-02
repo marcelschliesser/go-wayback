@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"sort"
+	"strconv"
 )
 
 type Data struct {
@@ -86,6 +88,40 @@ func convertResponse(input [][]string) []Record {
 	}
 }
 
+func partitionUrls(records []Record) []Record {
+	partitions := make(map[string]Record)
+
+	for _, entry := range records {
+		original := entry.Original
+		timestamp, err := strconv.Atoi(entry.Timestamp)
+		checkError(err)
+
+		if existing, ok := partitions[original]; !ok {
+			partitions[original] = entry
+		} else {
+			existingTimestamp, err := strconv.Atoi(existing.Timestamp)
+			checkError(err)
+
+			if timestamp > existingTimestamp {
+				partitions[original] = entry
+			}
+		}
+	}
+
+	// Convert the map to a slice
+	var result []Record
+	for _, v := range partitions {
+		result = append(result, v)
+	}
+
+	// Sort the slice by Original field
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Original < result[j].Original
+	})
+
+	return result
+}
+
 func indexPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/index.html"))
@@ -97,6 +133,7 @@ func indexPage(w http.ResponseWriter, r *http.Request) {
 		d.Domain = r.FormValue("domain")
 		d.Year = r.FormValue("year")
 		d.Records = convertResponse(returnArchiveUrls(d.Domain, d.Year))
+		d.Records = partitionUrls(d.Records)
 		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/result.html"))
 		err := tmpl.ExecuteTemplate(w, "base.html", d)
 		checkError(err)

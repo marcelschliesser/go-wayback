@@ -9,6 +9,12 @@ import (
 	"net/url"
 )
 
+type Data struct {
+	Domain  string
+	Year    string
+	Records []Record
+}
+
 type Record struct {
 	URLKey     string
 	Timestamp  string
@@ -27,10 +33,12 @@ func checkError(err error) {
 		log.Fatal(err)
 	}
 }
+
 func main() {
 	http.HandleFunc("/", HomePage)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
+
 func returnArchiveUrls(domain, year string) [][]string {
 	base_url, _ := url.Parse("https://web.archive.org/cdx/search/cdx?")
 	query := url.Values{}
@@ -92,10 +100,12 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodPost {
 		domain := r.FormValue("domain")
 		year := r.FormValue("year")
-		d := returnArchiveUrls(domain, year)
-		converted := convertResponse(d)
+		var d Data
+		d.Domain = domain
+		d.Year = year
+		d.Records = convertResponse(returnArchiveUrls(domain, year))
 		tmpl := template.Must(template.ParseFiles("templates/base.html", "templates/result.html"))
-		err := tmpl.ExecuteTemplate(w, "base.html", converted)
+		err := tmpl.ExecuteTemplate(w, "base.html", d)
 		checkError(err)
 		return
 	}

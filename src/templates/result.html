@@ -1,9 +1,9 @@
 {{define "content"}}
 <hgroup>
     <h1>Result</h1>
-    <h2>For the entered <strong>domain</strong> and <strong>year</strong> i found the following Urls.</h2>
+    <h2>For the entered domain <strong>{{ .Domain}}</strong> and year <strong>{{ .Year}}</strong> i found <strong>{{ .Records | len }} Urls</strong> with a HTTP Status Code of <strong>200</strong>.</h2>
 </hgroup>
-{{ if . }}
+{{ if .Records }}
 <table>
     <tr>
       <th><strong>Timestamp</strong></th>
@@ -11,7 +11,7 @@
       <th><strong>StatusCode</strong></th>
       <th><strong>Url</strong></th>
     </tr>
-    {{ range . }}
+    {{ range .Records }}
         <tr>
             <td>{{ index .Timestamp }}</td>
             <td>{{ index .MimeType }}</td>

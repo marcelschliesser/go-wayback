@@ -18,8 +18,6 @@ type Job struct {
 	Year      string
 }
 
-var httpClient = &http.Client{}
-
 func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)

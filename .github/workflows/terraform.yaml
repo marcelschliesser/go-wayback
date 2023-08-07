@@ -20,20 +20,17 @@ jobs:
         with:
           terraform_version: 1.x
           terraform_wrapper: false
-      
-      - name: Change to infrastructure directory
-        run: cd infrastructure
 
       - name: Terraform Format
-        run: terraform fmt -check
+        run: terraform -chdir=infrastructure fmt -check
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform -chdir=infrastructure validate
 
       - name: Terraform Plan
-        run: terraform plan -out=plan.tfplan
+        run: terraform -chdir=infrastructure plan -out=plan.tfplan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve plan.tfplan
+        run: terraform -chdir=infrastructure apply -auto-approve plan.tfplan
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.TERRAFORM_SERVICE_ACCOUNT }}

@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'infrastructure/**'
+      - '.github/workflows/terraform.yaml'
 
 jobs:
   terraform:

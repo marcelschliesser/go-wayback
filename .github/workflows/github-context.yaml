@@ -1,6 +1,6 @@
 name: Print GitHub Context Variables
 
-on: [push]
+on: workflow_dispatch
 
 jobs:
   print_context:

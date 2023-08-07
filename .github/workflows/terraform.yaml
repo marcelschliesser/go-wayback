@@ -1,4 +1,4 @@
-name: Deploy Terraform to GCP
+name: Terraform
 
 on:
   push:
@@ -19,6 +19,9 @@ jobs:
         with:
           terraform_version: 1.x
           terraform_wrapper: false
+      
+      - name: Change to infrastructure directory
+        run: cd infrastructure
 
       - name: Terraform Format
         run: terraform fmt -check

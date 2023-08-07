@@ -24,6 +24,9 @@ jobs:
       - name: Terraform Format
         run: terraform -chdir=infrastructure fmt -check
 
+      - name: Terraform Init
+        run: terraform -chdir=infrastructure init
+
       - name: Terraform Validate
         run: terraform -chdir=infrastructure validate
 

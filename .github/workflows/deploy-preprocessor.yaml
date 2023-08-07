@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'preprocessor/**'
+      - '.github/workflows/deploy-preprocessor.yaml'
 
 env:
   GCP_PROJECT: ${{ secrets.GCP_PROJECT }}

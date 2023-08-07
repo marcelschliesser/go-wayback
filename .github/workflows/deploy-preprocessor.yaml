@@ -31,7 +31,7 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        docker build -t gcr.io/$GCP_PROJECT/$SERVICE_NAME:$GITHUB_SHA .
+        docker build -t gcr.io/$GCP_PROJECT/$SERVICE_NAME:$GITHUB_SHA preprocessor/
         docker push gcr.io/$GCP_PROJECT/$SERVICE_NAME:$GITHUB_SHA
 
     - name: Deploy to Cloud Run

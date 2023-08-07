@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -55,14 +54,10 @@ func PublishMessage(projectID, topicName string, data Job) (string, error) {
 	ctx := context.Background()
 
 	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return "", fmt.Errorf("failed to marshal data: %v", err)
-	}
+	checkError(err)
 
 	client, err := pubsub.NewClient(ctx, projectID)
-	if err != nil {
-		return "", fmt.Errorf("failed to create client: %v", err)
-	}
+	checkError(err)
 	defer client.Close()
 
 	topic := client.Topic(topicName)
@@ -72,9 +67,7 @@ func PublishMessage(projectID, topicName string, data Job) (string, error) {
 	}
 
 	msgID, err := topic.Publish(ctx, msg).Get(ctx)
-	if err != nil {
-		return "", fmt.Errorf("failed to publish message: %v", err)
-	}
+	checkError(err)
 
 	return msgID, nil
 }

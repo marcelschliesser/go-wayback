@@ -1,0 +1,35 @@
+name: Deploy Terraform to GCP
+
+on:
+  push:
+    paths:
+      - 'infrastructure/**'
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.x
+          terraform_wrapper: false
+
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=plan.tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve plan.tfplan
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.TERRAFORM_SERVICE_ACCOUNT }}

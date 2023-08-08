@@ -18,6 +18,7 @@ RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/hello
 FROM scratch
 # Copy our static executable.
 COPY --from=builder /go/bin/hello /go/bin/hello
+COPY --from=builder $GOPATH/src/mypackage/myapp/templates/ /templates/
 # Run the hello binary.
 EXPOSE 8080
 ENTRYPOINT ["/go/bin/hello"]

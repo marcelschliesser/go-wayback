@@ -6,13 +6,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"path"
 	"time"
 
 	"cloud.google.com/go/pubsub"
 )
-
-var userInputTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/user-input.html"))
-var resultTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/result.html"))
 
 type Job struct {
 	OrderedAt time.Time
@@ -27,35 +25,39 @@ func checkError(err error) {
 	}
 }
 
+func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+	parsedTemplate, _ := template.ParseFiles(path.Join("./templates", tmpl), "templates/layout.html")
+	err := parsedTemplate.Execute(w, data)
+	checkError(err)
+}
+
 func indexPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		err := userInputTemplate.ExecuteTemplate(w, "user-input.html", nil)
-		checkError(err)
+
+		renderTemplate(w, "user-input.html", nil)
+
 	} else if r.Method == http.MethodPost {
+
 		var j Job
 		j.Domain = r.FormValue("domain")
 		j.Year = r.FormValue("year")
 		j.Email = r.FormValue("email")
 		j.OrderedAt = time.Now()
 
-		msgID, err := PublishMessage("go-wayback", "test-topic", j)
-		checkError(err)
-		log.Printf("Message published with ID: %s\n", msgID)
+		PublishMessage("test-topic", j)
 
-		err = resultTemplate.ExecuteTemplate(w, "result.html", j)
-		checkError(err)
+		renderTemplate(w, "result.html", j)
 	}
 
 }
 
-// PublishMessage sends a message to a specified Google Cloud Pub/Sub topic.
-func PublishMessage(projectID, topicName string, data Job) (string, error) {
+func PublishMessage(topicName string, data Job) {
 	ctx := context.Background()
 
 	jsonData, err := json.Marshal(data)
 	checkError(err)
 
-	client, err := pubsub.NewClient(ctx, projectID)
+	client, err := pubsub.NewClient(ctx, "go-wayback")
 	checkError(err)
 	defer client.Close()
 
@@ -68,7 +70,7 @@ func PublishMessage(projectID, topicName string, data Job) (string, error) {
 	msgID, err := topic.Publish(ctx, msg).Get(ctx)
 	checkError(err)
 
-	return msgID, nil
+	log.Printf("Message published with ID: %s\n", msgID)
 }
 
 func main() {

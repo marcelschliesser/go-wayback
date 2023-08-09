@@ -12,7 +12,7 @@ import (
 )
 
 var templates = template.Must(template.ParseFiles(
-	"templates/base.html",
+	"templates/layout.html",
 	"templates/result.html",
 	"templates/user-input.html"))
 
@@ -31,7 +31,7 @@ func checkError(err error) {
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		err := templates.ExecuteTemplate(w, "templates/user-input.html", nil)
+		err := templates.ExecuteTemplate(w, "user-input.html", nil)
 		checkError(err)
 	} else if r.Method == http.MethodPost {
 		var j Job
@@ -44,7 +44,7 @@ func indexPage(w http.ResponseWriter, r *http.Request) {
 		checkError(err)
 		log.Printf("Message published with ID: %s\n", msgID)
 
-		err = templates.ExecuteTemplate(w, "templates/result.html", j)
+		err = templates.ExecuteTemplate(w, "result.html", j)
 		checkError(err)
 	}
 

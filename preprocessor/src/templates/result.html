@@ -1,4 +1,6 @@
-{{define "content"}}
+{{ template "layout" . }}
+
+{{ define "content" }}
 <hgroup>
     <h1>We received your Job</h1>
     <h2>Sent you a download link when the data is ready.</h2>
@@ -8,4 +10,4 @@
 <p>{{ .Email }}</p>
 <p>{{ .OrderedAt }}</p>
 
-{{end}}
+{{ end }}

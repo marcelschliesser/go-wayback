@@ -11,10 +11,8 @@ import (
 	"cloud.google.com/go/pubsub"
 )
 
-var templates = template.Must(template.ParseFiles(
-	"templates/layout.html",
-	"templates/result.html",
-	"templates/user-input.html"))
+var userInputTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/user-input.html"))
+var resultTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/result.html"))
 
 type Job struct {
 	OrderedAt time.Time
@@ -31,7 +29,7 @@ func checkError(err error) {
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		err := templates.ExecuteTemplate(w, "user-input.html", nil)
+		err := userInputTemplate.ExecuteTemplate(w, "user-input.html", nil)
 		checkError(err)
 	} else if r.Method == http.MethodPost {
 		var j Job
@@ -44,7 +42,7 @@ func indexPage(w http.ResponseWriter, r *http.Request) {
 		checkError(err)
 		log.Printf("Message published with ID: %s\n", msgID)
 
-		err = templates.ExecuteTemplate(w, "result.html", j)
+		err = resultTemplate.ExecuteTemplate(w, "result.html", j)
 		checkError(err)
 	}
 

@@ -4,3 +4,11 @@ tasks:
   run:
     cmds:
       - cd src && go run main.go
+  
+  docker-build:
+    cmds:
+      - docker build -t webserver .
+  
+  docker-run:
+    cmds:
+      - docker run -p "8080:8080" webserver:latest
